@@ -1,0 +1,16 @@
+/node_modules
+
+/.git
+
+/.next
+
+/.eslintrc.cjs
+
+/.eslintcache
+
+/next.config.js
+
+/tsconfig.json
+
+/tsconfig.test.json
+
