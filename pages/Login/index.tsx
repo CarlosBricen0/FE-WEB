@@ -15,7 +15,11 @@ const Login = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
 
-  const loginMongo = (usuario: string, password: string) => {
+  const loginMongo = (
+    usuario: string | undefined,
+    password: string | undefined
+  ) => {
+    debugger
     console.log(
       'conexion a la db usuario : ' + usuario + ' password: ' + password
     )
