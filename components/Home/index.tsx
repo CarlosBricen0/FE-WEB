@@ -1,5 +1,5 @@
 import { useGetUsers } from '../../shared/hooks/api-db'
-import { Container, Text } from 'components-front-end'
+import { Container, Spacer, Text } from 'components-front-end'
 import React from 'react'
 
 export const HomeWeb = (): React.ReactElement => {
@@ -13,19 +13,22 @@ export const HomeWeb = (): React.ReactElement => {
   return (
     <Container
       isWrap
-      minHeight='1000px'
-      height='1000px'
+      minHeight='auto'
     >
       {data?.map((user, index) => {
         return (
           <React.Fragment key={`key-${index}`}>
-            <Container isWrap>
+            <Container
+              isWrap
+              height='100px'
+            >
               <Text
                 fontSize='lg'
                 color='primary-green'
               >
                 Usuario: {user?.user}
               </Text>
+              <Spacer.Vertical size={24} />
               <Text
                 fontSize='lg'
                 color='primary-green'
@@ -33,6 +36,7 @@ export const HomeWeb = (): React.ReactElement => {
                 Contraseña: {user?.password}
               </Text>
             </Container>
+            <Spacer.Horizontal size={24} />
           </React.Fragment>
         )
       })}

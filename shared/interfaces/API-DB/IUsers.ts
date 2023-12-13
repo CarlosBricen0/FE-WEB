@@ -3,3 +3,4 @@ export interface IUser {
   password: string
 }
 export type IResponseUser = IUser[]
+export type IRequestUser = IUser[]
