@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 export const saltRounds = process.env.NEXT_PUBLIC_SALT_ROUNDS || 2
 
@@ -12,12 +12,16 @@ export const encryptPass = async (plainPassword: string): Promise<string> => {
     throw err
   }
 }
+
 export const decryptPass = async (
   userEnteredPassword: string,
   savedHashedPassword: string
-): Promise<Boolean> => {
+): Promise<boolean> => {
   try {
-    const isMatch = bcrypt.compare(userEnteredPassword, savedHashedPassword)
+    const isMatch = await bcrypt.compare(
+      userEnteredPassword,
+      savedHashedPassword
+    )
     console.log('Contraseña válida ' + isMatch)
     return isMatch
   } catch (error) {
