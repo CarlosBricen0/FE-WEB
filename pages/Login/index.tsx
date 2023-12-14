@@ -10,17 +10,17 @@ import {
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
 import { useRef } from 'react'
-import { useGetUsers } from '../../shared/hooks/api-db'
+import { useGetUser } from '../../shared/hooks/api-db'
 
 const Login = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
 
   const loginMongo = async (usuario: string, password: string) => {
-      const { data, isLoading, error, isSuccess } = useGetUsers(
+    const { data, isLoading, error, isSuccess } = useGetUser(
       `getUserByName/${usuario}`
-    ) 
-    
+    )
+
     /*debugger
     const hashedPassword = await encryptPass(password)
     debugger*/
