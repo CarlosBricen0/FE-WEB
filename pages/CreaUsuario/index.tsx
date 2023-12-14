@@ -10,25 +10,31 @@ import {
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
 import { useRef, useState } from 'react'
-import { useGetUserLogin } from '../../shared/hooks/api-db'
+import { useGetUserLogin, usePostDataToApi } from '../../shared/hooks/api-db'
+import { IUser } from '@/shared/interfaces/API-DB/IUsers'
 
-const Login = () => {
+const CreaUsuario = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
-  const [nameUser , setNameUser] = useState('') 
-  const { data, isLoading, error, isSuccess } = useGetUserLogin(
-    `getUserByName/${nameUser}`
+  const [nameCreateUser , setCreateUser] = useState<IUser>() 
+  const { data, isLoading, error, isSuccess } = usePostDataToApi(
+    `createUser/${nameCreateUser}`
   )
 
 
-  const loginMongo = async (usuario: string, password: string) => {
-   
-    setNameUser(usuario)
+  const creaUsuarioMongo = async (usuario: string, password: string) => {
+    console.log(`ingreso a la función`)
+    const passwordEncrypted:string = '1234';//await encryptPass(password)
+    debugger
+    setCreateUser({user:usuario,password:passwordEncrypted})
+    
+
+    /*setNameUser(usuario)
     if(data?.password == password){
       console.log(`Conexión de usuario exitosa`)
     }else{
       console.log(`Usuario o Contraseña invalidos`)
-    }
+    }*/
     /*debugger
     const hashedPassword = await encryptPass(password)
     debugger*/
@@ -95,10 +101,10 @@ const Login = () => {
             <Row justifyContent='end'>
               <Button
                 color='white'
-                label='Acceder'
+                label='Crear'
                 background='rgb(13, 33, 89)'
                 onClick={() => {
-                  loginMongo(
+                  creaUsuarioMongo(
                     inputUser?.current?.value || '',
                     inputPassword?.current?.value || ''
                   )
@@ -111,4 +117,4 @@ const Login = () => {
     </Container>
   )
 }
-export default Login
+export default CreaUsuario
