@@ -17,15 +17,16 @@ const Login = () => {
   const inputPassword = useRef<HTMLInputElement>(null)
 
   const loginMongo = async (usuario: string, password: string) => {
-    /*  const { data, isLoading, error, isSuccess } = useGetUsers(
+      const { data, isLoading, error, isSuccess } = useGetUsers(
       `getUserByName/${usuario}`
-    ) */
-    debugger
+    ) 
+    
+    /*debugger
     const hashedPassword = await encryptPass(password)
-    debugger
-    console.log(
+    debugger*/
+    /*console.log(
       `conexion a la db usuario : ${usuario} password: ${hashedPassword}`
-    )
+    )*/
   }
 
   return (
