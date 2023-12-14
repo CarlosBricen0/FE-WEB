@@ -12,20 +12,15 @@ You can explain with words and images how to test it or use only the next symbol
 
 You can explain with words and images how to test it or use only the next symbol ❌ to explain that this point its N/A
 
-4️⃣ **What JIRA ticket is this PR related?** (REQUIRED - Leave ticket's URL if no ticket add ❌)
+4️⃣ **What Notion ticket is this PR related?** (REQUIRED - Leave ticket's URL if no ticket add ❌)
 
 - [x] add url to jira ticket here
 
-5️⃣ **Does this PR have other teams dependencies?** (REQUIRED - Like Backend updates or something)
-
-- [ ] Yes
-- [ ] No
-
-6️⃣ **PR's related**
+5️⃣ **PR's related**
 
 - [ ] add PR url here if you dont have PR's related leave an ❌
 
-7️⃣ **Types of changes** (REQUIRED - Choose only options what you need delete the rest)
+6️⃣ **Types of changes** (REQUIRED - Choose only options what you need delete the rest)
 
 - [ ] Bug fix (a non-breaking change which fixes an issue)
 - [ ] New feature (a non-breaking change which adds functionality)

@@ -70,6 +70,7 @@ export const BaseHeader = ({
         <Column
           margin={marginColumnButtons}
           customWidth={widthColumnSection}
+          alignSelf='center'
         >
           <Button
             background={backgroundButtons}
