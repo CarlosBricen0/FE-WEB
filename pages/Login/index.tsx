@@ -9,32 +9,31 @@ import {
   Text
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
-import { useRef, useState } from 'react'
-import { useGetUserLogin } from '../../shared/hooks/api-db'
+import { useEffect, useRef, useState } from 'react'
+import { useGetUser, usePostUser } from '../../shared/hooks/api-db'
 
 const Login = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
-  const [nameUser , setNameUser] = useState('') 
-  const { data, isLoading, error, isSuccess } = useGetUserLogin(
-    `getUserByName/${nameUser}`
+  const [nameUser, setNameUser] = useState<string>('')
+  const { data, refetch } = useGetUser(
+    `getUserByName/${nameUser}`,
+    { enabled: false } // Deshabilita la consulta inicial
   )
 
-
-  const loginMongo = async (usuario: string, password: string) => {
-   
-    setNameUser(usuario)
-    if(data?.password == password){
-      console.log(`Conexión de usuario exitosa`)
-    }else{
-      console.log(`Usuario o Contraseña invalidos`)
-    }
-    /*debugger
-    const hashedPassword = await encryptPass(password)
-    debugger*/
-    /*console.log(
-      `conexion a la db usuario : ${usuario} password: ${hashedPassword}`
-    )*/
+  const loginMongo = async (user: string, password: string) => {
+    setNameUser(user)
+    await refetch()
+      .then(() => {
+        if (!Array.isArray(data) && data?.password == password) {
+          console.log(`Conexión de usuario exitosa`)
+        } else {
+          console.log(`Usuario o Contraseña invalidos`)
+        }
+      })
+      .catch((error) => {
+        console.error('Error al cargar los datos:', error)
+      })
   }
 
   return (
@@ -111,4 +110,5 @@ const Login = () => {
     </Container>
   )
 }
+
 export default Login

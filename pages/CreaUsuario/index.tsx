@@ -10,37 +10,24 @@ import {
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
 import { useRef, useState } from 'react'
-import { useGetUserLogin, usePostDataToApi } from '../../shared/hooks/api-db'
 import { IUser } from '@/shared/interfaces/API-DB/IUsers'
+import { usePostUser } from '../../shared/hooks/api-db'
 
 const CreaUsuario = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
-  const [nameCreateUser , setCreateUser] = useState<IUser>() 
-  const { data, isLoading, error, isSuccess } = usePostDataToApi(
-    `createUser/${nameCreateUser}`
-  )
-
+  const { mutate, data, isLoading, isError, error, isSuccess } =
+    usePostUser('createUser')
 
   const creaUsuarioMongo = async (usuario: string, password: string) => {
     console.log(`ingreso a la función`)
-    const passwordEncrypted:string = '1234';//await encryptPass(password)
+    const passwordEncrypted: string = await encryptPass(password)
     debugger
-    setCreateUser({user:usuario,password:passwordEncrypted})
-    
+    mutate({ user: usuario, password: passwordEncrypted })
 
-    /*setNameUser(usuario)
-    if(data?.password == password){
-      console.log(`Conexión de usuario exitosa`)
-    }else{
-      console.log(`Usuario o Contraseña invalidos`)
-    }*/
-    /*debugger
-    const hashedPassword = await encryptPass(password)
-    debugger*/
-    /*console.log(
-      `conexion a la db usuario : ${usuario} password: ${hashedPassword}`
-    )*/
+    if (isSuccess) {
+      console.log('se creó la petición')
+    }
   }
 
   return (

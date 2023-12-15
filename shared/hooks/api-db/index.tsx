@@ -1,9 +1,5 @@
-import {
-  IResponseUsers,
-  IResponseUser,
-  IUser
-} from '../../../shared/interfaces/API-DB/IUsers'
-import { createUser, methoGet, methoGets } from '../../../shared/services/api-db'
+import { IUser } from '../../../shared/interfaces/API-DB/IUsers'
+import { methodPostUser, methoGetUser } from '../../../shared/services/api-db'
 import {
   useQuery,
   UseQueryOptions,
@@ -13,29 +9,23 @@ import {
   UseMutationOptions,
   useMutation
 } from 'react-query'
+import { AxiosResponse } from 'axios'
 
 // Hook personalizado utilizando react-query para una petición GET
-export const useGetUsers = (
+export const useGetUser = (
   apiPath: string,
-  options?: UseQueryOptions<IResponseUsers, Error>
-): UseQueryResult<IResponseUsers, Error> => {
-  const queryFn: QueryFunction<IResponseUsers> = () => methoGets(apiPath)
-  return useQuery<IResponseUsers, Error>(apiPath, queryFn, options)
-}
-//return only 1 user
-export const useGetUserLogin = (
-  apiPath: string,
-  options?: UseQueryOptions<IResponseUser, Error>
-): UseQueryResult<IResponseUser, Error> => {
-  const queryFn: QueryFunction<IResponseUser> = () => methoGet(apiPath)
-  return useQuery<IResponseUser, Error>(apiPath, queryFn, options)
+  options?: UseQueryOptions<IUser[] | IUser, Error>
+): UseQueryResult<IUser[] | IUser, Error> => {
+  const queryFn: QueryFunction<IUser[] | IUser> = () => methoGetUser(apiPath)
+  return useQuery<IUser[] | IUser, Error>(apiPath, queryFn, options)
 }
 
-
-export const usePostDataToApi = (
+export const usePostUser = (
   apiPath: string,
-  options?: UseMutationOptions<IResponseUser, Error, IUser>
-): UseMutationResult<IResponseUser, Error, IUser> => {
-  return useMutation<IResponseUser, Error, IUser>((userData: IUser) => createUser(apiPath, userData), options);
-}; 
-
+  options?: UseMutationOptions<IUser, Error, IUser>
+): UseMutationResult<IUser, Error, IUser> => {
+  return useMutation<IUser, Error, IUser>(
+    (userData: IUser) => methodPostUser(apiPath, userData),
+    options
+  )
+}
