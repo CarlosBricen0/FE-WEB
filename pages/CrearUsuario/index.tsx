@@ -10,41 +10,23 @@ import {
   Text
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePostUser } from '../../shared/hooks/api-db'
-
-export const handleKeyEnterUser = (
-  usuario: string,
-  password: string,
-  setButtonStatus: (statusButton: ButtonStatus) => void
-) => {
-  debugger
-  if (usuario.length > 0 && password.length > 0) {
-    setButtonStatus('initial')
-  } else {
-    setButtonStatus('disabled')
-  }
-}
 
 const CrearUsuario = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
-  const [buttonStatus, setButtonStatus] = useState<ButtonStatus>('disabled')
   const { mutate, data, isLoading, isError, error, isSuccess } =
     usePostUser('createUser')
 
   const creaUsuarioMongo = async (usuario: string, password: string) => {
-    setButtonStatus('loading')
     console.log(`ingreso a la función`)
     const passwordEncrypted: string = await encryptPass(password)
-    mutate({ user: usuario, password: passwordEncrypted })
-
+    mutate({ user: usuario, password: passwordEncrypted }) //ejecutamos la petición con mutate
     if (isSuccess) {
       console.log('Usuario creado correctamente ')
     }
-    setButtonStatus('initial')
   }
-
   return (
     <Container
       backgroundColor='white'
@@ -102,19 +84,10 @@ const CrearUsuario = () => {
             <Spacer.Horizontal size={24} />
             <Row justifyContent='end'>
               <Button
-                status={buttonStatus}
+                status={'initial'}
                 color='white'
                 label='Crear'
-                background={
-                  buttonStatus === 'disabled' ? 'gray' : 'rgb(13, 33, 89)'
-                }
-                onChange={() => {
-                  handleKeyEnterUser(
-                    inputUser?.current?.value || '',
-                    inputPassword?.current?.value || '',
-                    setButtonStatus
-                  )
-                }}
+                background={'rgb(13, 33, 89)'}
                 onClick={() => {
                   creaUsuarioMongo(
                     inputUser?.current?.value || '',

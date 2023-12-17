@@ -4,7 +4,8 @@ import React from 'react'
 import { IUser } from '@/shared/interfaces/API-DB/IUsers'
 
 export const HomeWeb = (): React.ReactElement => {
-  const { data, isLoading, error } = useGetUser('listUser', {
+  return <></>
+  /* const { data, isLoading, error } = useGetUser('listUser', {
     enabled: false //petición cancelada
   })
   if (isLoading) {
@@ -46,5 +47,5 @@ export const HomeWeb = (): React.ReactElement => {
           )
         })}
     </Container>
-  )
+  ) */
 }

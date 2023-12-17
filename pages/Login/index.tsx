@@ -14,13 +14,11 @@ import { useRef, useState } from 'react'
 import { useGetUser } from '../../shared/hooks/api-db'
 import { setCookie } from '../../shared/helpers/cookie/cookie'
 import { TWENTY_FOUR_HOURS_MILLI_SECONDS } from '../../shared/constants'
-import { handleKeyEnterUser } from '../CrearUsuario'
 
 const Login = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
   const [nameUser, setNameUser] = useState<string>('')
-  const [buttonStatus, setButtonStatus] = useState<ButtonStatus>('disabled')
   const { data, refetch } = useGetUser(
     `getUserByName/${nameUser}`,
     { enabled: false } // Deshabilita la consulta inicial
@@ -29,7 +27,7 @@ const Login = () => {
   const loginMongo = async (user: string, password: string) => {
     setNameUser(user)
     setTimeout(async () => {
-      await refetch()
+      await refetch() //ejecutamos la petición con refetch
         .then(async () => {
           if (!Array.isArray(data) && data?.password) {
             const isMatchPassWord = await decryptPass(password, data?.password)
@@ -110,17 +108,8 @@ const Login = () => {
               <Button
                 color='white'
                 label='Acceder'
-                status={buttonStatus}
-                background={
-                  buttonStatus === 'disabled' ? 'gray' : 'rgb(13, 33, 89)'
-                }
-                onChange={() => {
-                  handleKeyEnterUser(
-                    inputUser?.current?.value || '',
-                    inputPassword?.current?.value || '',
-                    setButtonStatus
-                  )
-                }}
+                status='initial'
+                background='rgb(13, 33, 89)'
                 onClick={() => {
                   loginMongo(
                     inputUser?.current?.value || '',
