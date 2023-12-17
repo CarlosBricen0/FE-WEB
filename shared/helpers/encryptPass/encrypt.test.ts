@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs'
 import { encryptPass,decryptPass } from './encrypt';
 
 
@@ -20,7 +19,7 @@ describe('Encryption Functions', () => {
 
   it('should reject an invalid password', async () => {
     const plainPassword = 'myPassword';
-    const hashedPassword = await  bcrypt.hash(plainPassword, 10);
+    const hashedPassword = await  encryptPass(plainPassword);
     const isMatch = await decryptPass('wrongPassword', hashedPassword);
     expect(isMatch).toBe(false); // Check if the decryption rejects the wrong password
   });

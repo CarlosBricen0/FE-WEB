@@ -1,4 +1,4 @@
-import { decryptPass } from '../../shared/helpers/encryptPass/encrypt'
+import { encryptPass } from '../../shared/helpers/encryptPass/encrypt'
 import {
   Button,
   ButtonStatus,
@@ -10,45 +10,23 @@ import {
   Text
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
-import { useRef, useState } from 'react'
-import { useGetUser } from '../../shared/hooks/api-db'
-import { setCookie } from '../../shared/helpers/cookie/cookie'
-import { TWENTY_FOUR_HOURS_MILLI_SECONDS } from '../../shared/constants'
+import { useEffect, useRef, useState } from 'react'
+import { usePostUser } from '../../shared/hooks/api-db'
 
-const Login = () => {
+const CrearUsuario = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
-  const [nameUser, setNameUser] = useState<string>('')
-  const { data, refetch } = useGetUser(
-    `getUserByName/${nameUser}`,
-    { enabled: false } // Deshabilita la consulta inicial
-  )
+  const { mutate, data, isLoading, isError, error, isSuccess } =
+    usePostUser('createUser')
 
-  const loginMongo = async (user: string, password: string) => {
-    setNameUser(user)
-    setTimeout(async () => {
-      await refetch() //ejecutamos la petición con refetch
-        .then(async () => {
-          if (!Array.isArray(data) && data?.password) {
-            const isMatchPassWord = await decryptPass(password, data?.password)
-            if (isMatchPassWord) {
-              setCookie(
-                'authToken',
-                data?.password,
-                TWENTY_FOUR_HOURS_MILLI_SECONDS
-              )
-            } else {
-              console.log(`Usuario o Contraseña incorrectos`)
-            }
-            console.log(`Conexión de usuario exitosa`)
-          }
-        })
-        .catch((error) => {
-          console.error('Error al cargar los datos:', error)
-        })
-    }, 10)
+  const creaUsuarioMongo = async (usuario: string, password: string) => {
+    console.log(`ingreso a la función`)
+    const passwordEncrypted: string = await encryptPass(password)
+    mutate({ user: usuario, password: passwordEncrypted }) //ejecutamos la petición con mutate
+    if (isSuccess) {
+      console.log('Usuario creado correctamente ')
+    }
   }
-
   return (
     <Container
       backgroundColor='white'
@@ -106,12 +84,12 @@ const Login = () => {
             <Spacer.Horizontal size={24} />
             <Row justifyContent='end'>
               <Button
+                status={'initial'}
                 color='white'
-                label='Acceder'
-                status='initial'
-                background='rgb(13, 33, 89)'
+                label='Crear'
+                background={'rgb(13, 33, 89)'}
                 onClick={() => {
-                  loginMongo(
+                  creaUsuarioMongo(
                     inputUser?.current?.value || '',
                     inputPassword?.current?.value || ''
                   )
@@ -124,5 +102,4 @@ const Login = () => {
     </Container>
   )
 }
-
-export default Login
+export default CrearUsuario

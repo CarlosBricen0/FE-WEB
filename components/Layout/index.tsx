@@ -1,3 +1,4 @@
+import useSession from '../../shared/hooks/useSession/session'
 import { Column, Container, Row, Spacer } from 'components-front-end'
 import { Header, Footer } from './../'
 
@@ -6,6 +7,16 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children }: LayoutProps): React.ReactElement => {
+  const { isLoggedIn } = useSession()
+
+  /* if (isLoggedIn) {
+    // Si no está autenticado, puedes redirigirlo o mostrar un mensaje de sesión expirada
+    return (
+      <div>Tu sesión ha expirado. Por favor, inicia sesión nuevamente.</div>
+    )
+  } */
+
+  // Resto de tu componente
   return (
     <Container isWrap>
       <Header />

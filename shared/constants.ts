@@ -16,6 +16,8 @@ export const PUT = 'PUT'
 
 //OPTIONS to React Query
 export const FIVE_MINUTES_OUTDATED_INFO = 1000 * 60 * 5
+//Time 24 hrs in milliseconds
+export const TWENTY_FOUR_HOURS_MILLI_SECONDS = 24 * 60 * 60 * 1000
 
 // HTTP STATUS CODE
 export const INTERNAL_SERVER_ERROR = 500
