@@ -1,5 +1,5 @@
 import { IUser } from '@/shared/interfaces/API-DB/IUsers'
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
 // Creamos una instancia de Axios con la URL base configurada
 const httpClientMongo: AxiosInstance = axios.create({
@@ -12,8 +12,10 @@ const uriBase = 'api/user/'
 export const methoGetUser = async (
   apiPath: string
 ): Promise<IUser[] | IUser> => {
-  const response: IUser[] | IUser = await httpClientMongo.get(uriBase + apiPath)
-  return response // Devolvemos directamente los datos sin incluir la AxiosResponse
+  const response: AxiosResponse<IUser[] | IUser> = await httpClientMongo.get(
+    uriBase + apiPath
+  )
+  return response.data // Devolvemos directamente los datos sin incluir la AxiosResponse
 }
 
 // Función para invocar una petición POST a la API con los datos proporcionados
@@ -21,7 +23,10 @@ export const methodPostUser = async (
   apiPath: string,
   userData: IUser
 ): Promise<IUser> => {
-  const response: IUser = await httpClientMongo.post(apiPath, userData)
+  const response: IUser = await httpClientMongo.post(
+    uriBase + apiPath,
+    userData
+  )
   return response
 }
 /*

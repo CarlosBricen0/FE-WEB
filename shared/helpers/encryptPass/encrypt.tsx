@@ -1,11 +1,14 @@
 import bcrypt from 'bcryptjs'
 
-export const saltRounds = process.env.NEXT_PUBLIC_SALT_ROUNDS || 2
-
+export const saltRounds = parseInt(
+  process?.env?.NEXT_PUBLIC_SALT_ROUNDS || '11'
+)
 export const encryptPass = async (plainPassword: string): Promise<string> => {
   try {
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
-    console.log('Contraseña encriptada:', hashedPassword)
+    console.log(
+      `Contraseña encriptada:' ${hashedPassword}  salts : ${saltRounds} `
+    )
     return hashedPassword
   } catch (err) {
     console.error('Error : ' + err)

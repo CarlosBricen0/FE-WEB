@@ -4,8 +4,9 @@ import React from 'react'
 import { IUser } from '@/shared/interfaces/API-DB/IUsers'
 
 export const HomeWeb = (): React.ReactElement => {
-  const { data, isLoading, error } = useGetUser('listUser')
-  debugger
+  const { data, isLoading, error } = useGetUser('listUser', {
+    enabled: false //petición cancelada
+  })
   if (isLoading) {
     return <>Está cargando ctm</>
   }

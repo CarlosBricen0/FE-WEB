@@ -1,6 +1,7 @@
 import { encryptPass } from '../../shared/helpers/encryptPass/encrypt'
 import {
   Button,
+  ButtonStatus,
   Column,
   Container,
   Input,
@@ -10,24 +11,38 @@ import {
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
 import { useRef, useState } from 'react'
-import { IUser } from '@/shared/interfaces/API-DB/IUsers'
 import { usePostUser } from '../../shared/hooks/api-db'
 
-const CreaUsuario = () => {
+export const handleKeyEnterUser = (
+  usuario: string,
+  password: string,
+  setButtonStatus: (statusButton: ButtonStatus) => void
+) => {
+  debugger
+  if (usuario.length > 0 && password.length > 0) {
+    setButtonStatus('initial')
+  } else {
+    setButtonStatus('disabled')
+  }
+}
+
+const CrearUsuario = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
+  const [buttonStatus, setButtonStatus] = useState<ButtonStatus>('disabled')
   const { mutate, data, isLoading, isError, error, isSuccess } =
     usePostUser('createUser')
 
   const creaUsuarioMongo = async (usuario: string, password: string) => {
+    setButtonStatus('loading')
     console.log(`ingreso a la función`)
     const passwordEncrypted: string = await encryptPass(password)
-    debugger
     mutate({ user: usuario, password: passwordEncrypted })
 
     if (isSuccess) {
-      console.log('se creó la petición')
+      console.log('Usuario creado correctamente ')
     }
+    setButtonStatus('initial')
   }
 
   return (
@@ -87,9 +102,19 @@ const CreaUsuario = () => {
             <Spacer.Horizontal size={24} />
             <Row justifyContent='end'>
               <Button
+                status={buttonStatus}
                 color='white'
                 label='Crear'
-                background='rgb(13, 33, 89)'
+                background={
+                  buttonStatus === 'disabled' ? 'gray' : 'rgb(13, 33, 89)'
+                }
+                onChange={() => {
+                  handleKeyEnterUser(
+                    inputUser?.current?.value || '',
+                    inputPassword?.current?.value || '',
+                    setButtonStatus
+                  )
+                }}
                 onClick={() => {
                   creaUsuarioMongo(
                     inputUser?.current?.value || '',
@@ -104,4 +129,4 @@ const CreaUsuario = () => {
     </Container>
   )
 }
-export default CreaUsuario
+export default CrearUsuario

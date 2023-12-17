@@ -1,6 +1,7 @@
-import { encryptPass } from '../../shared/helpers/encryptPass/encrypt'
+import { decryptPass } from '../../shared/helpers/encryptPass/encrypt'
 import {
   Button,
+  ButtonStatus,
   Column,
   Container,
   Input,
@@ -9,13 +10,17 @@ import {
   Text
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
-import { useEffect, useRef, useState } from 'react'
-import { useGetUser, usePostUser } from '../../shared/hooks/api-db'
+import { useRef, useState } from 'react'
+import { useGetUser } from '../../shared/hooks/api-db'
+import { setCookie } from '../../shared/helpers/cookie/cookie'
+import { TWENTY_FOUR_HOURS_MILLI_SECONDS } from '../../shared/constants'
+import { handleKeyEnterUser } from '../CrearUsuario'
 
 const Login = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
   const [nameUser, setNameUser] = useState<string>('')
+  const [buttonStatus, setButtonStatus] = useState<ButtonStatus>('disabled')
   const { data, refetch } = useGetUser(
     `getUserByName/${nameUser}`,
     { enabled: false } // Deshabilita la consulta inicial
@@ -23,17 +28,27 @@ const Login = () => {
 
   const loginMongo = async (user: string, password: string) => {
     setNameUser(user)
-    await refetch()
-      .then(() => {
-        if (!Array.isArray(data) && data?.password == password) {
-          console.log(`Conexión de usuario exitosa`)
-        } else {
-          console.log(`Usuario o Contraseña invalidos`)
-        }
-      })
-      .catch((error) => {
-        console.error('Error al cargar los datos:', error)
-      })
+    setTimeout(async () => {
+      await refetch()
+        .then(async () => {
+          if (!Array.isArray(data) && data?.password) {
+            const isMatchPassWord = await decryptPass(password, data?.password)
+            if (isMatchPassWord) {
+              setCookie(
+                'authToken',
+                data?.password,
+                TWENTY_FOUR_HOURS_MILLI_SECONDS
+              )
+            } else {
+              console.log(`Usuario o Contraseña incorrectos`)
+            }
+            console.log(`Conexión de usuario exitosa`)
+          }
+        })
+        .catch((error) => {
+          console.error('Error al cargar los datos:', error)
+        })
+    }, 10)
   }
 
   return (
@@ -95,7 +110,17 @@ const Login = () => {
               <Button
                 color='white'
                 label='Acceder'
-                background='rgb(13, 33, 89)'
+                status={buttonStatus}
+                background={
+                  buttonStatus === 'disabled' ? 'gray' : 'rgb(13, 33, 89)'
+                }
+                onChange={() => {
+                  handleKeyEnterUser(
+                    inputUser?.current?.value || '',
+                    inputPassword?.current?.value || '',
+                    setButtonStatus
+                  )
+                }}
                 onClick={() => {
                   loginMongo(
                     inputUser?.current?.value || '',
