@@ -11,21 +11,33 @@ import {
 } from 'components-front-end'
 import { BigScreen } from 'components-front-end/helpers'
 import { useEffect, useRef, useState } from 'react'
-import { usePostUser } from '../../shared/hooks/api-db'
+import { useGetUser, usePostUser } from '../../shared/hooks/api-db'
 
 const CrearUsuario = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
-  const { mutate, data, isLoading, isError, error, isSuccess } =
-    usePostUser('createUser')
+  const [nameUser, setNameUser] = useState<string>('')
+  const {
+    mutate,
+    data: dataCreateUser,
+    isLoading: isLoadingCreateUser,
+    isError: isErrorCreateUser,
+    error: errorCreateUser,
+    isSuccess: isSuccessCreateUser
+  } = usePostUser('createUser')
+  const { data: dataGetUser, refetch: refetchGetUser } = useGetUser(
+    `getUserByName/${nameUser}`,
+    { enabled: false } // Deshabilita la consulta inicial
+  )
 
   const creaUsuarioMongo = async (usuario: string, password: string) => {
     console.log(`ingreso a la función`)
     const passwordEncrypted: string = await encryptPass(password)
     mutate({ user: usuario, password: passwordEncrypted }) //ejecutamos la petición con mutate
-    if (isSuccess) {
+    if (isSuccessCreateUser) {
       console.log('Usuario creado correctamente ')
     }
+    debugger
   }
   return (
     <Container

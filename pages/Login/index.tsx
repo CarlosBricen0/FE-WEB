@@ -1,7 +1,6 @@
 import { decryptPass } from '../../shared/helpers/encryptPass/encrypt'
 import {
   Button,
-  ButtonStatus,
   Column,
   Container,
   Input,
@@ -37,6 +36,7 @@ const Login = () => {
                 data?.password,
                 TWENTY_FOUR_HOURS_MILLI_SECONDS
               )
+              console.log(`Usuario ingresó correctamente`)
             } else {
               console.log(`Usuario o Contraseña incorrectos`)
             }
