@@ -7,9 +7,9 @@ export const encryptPass = async (plainPassword: string): Promise<string> => {
   try {
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
     console.log(
-      `Contraseña encriptada:' ${hashedPassword}  salts : ${saltRounds} `
+      `Contraseña encriptada:' ${hashedPassword.replace('/', '$')}  salts : ${saltRounds} `
     )
-    return hashedPassword
+    return hashedPassword.replace('/', '$')
   } catch (err) {
     console.error('Error : ' + err)
     throw err
@@ -22,7 +22,7 @@ export const decryptPass = async (
 ): Promise<boolean> => {
   try {
     const isMatch = await bcrypt.compare(
-      userEnteredPassword,
+      userEnteredPassword.replace('/', '$'),
       savedHashedPassword
     )
     console.log('Contraseña válida ' + isMatch)

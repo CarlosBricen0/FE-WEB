@@ -25,7 +25,7 @@
     "bcryptjs": "2.4.3",
     "classnames": "2.3.1",
     "clean": "4.0.2",
-    "components-front-end": "1.0.0",
+    "components-front-end": "1.6.2",
     "crypto-js": "4.1.1",
     "fs": "0.0.1-security",
     "header-logomenu": "1.6.0",
