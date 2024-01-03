@@ -2,14 +2,14 @@ import { Button, Column, Container, Picture, Row } from 'components-front-end'
 import { useRouter } from 'next/router'
 import React from 'react'
 
-interface BaseHeaderProps {
+interface HeaderLogoutProps {
   widthButtons: string
   fontSizeBUtton: string
 }
-export const BaseHeader = ({
+export const HeaderLogout = ({
   widthButtons,
   fontSizeBUtton
-}: BaseHeaderProps) => {
+}: HeaderLogoutProps) => {
   const router = useRouter()
   const widthColumnSection = '25'
   const backgroundButtons = '#0d2159'

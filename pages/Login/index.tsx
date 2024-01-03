@@ -1,6 +1,7 @@
 import { decryptPass } from '../../shared/helpers/encryptPass/encrypt'
 import {
   Button,
+  ButtonStatus,
   Column,
   Container,
   Input,
@@ -13,40 +14,82 @@ import { useRef, useState } from 'react'
 import { useGetUser } from '../../shared/hooks/api-db'
 import { setCookie } from '../../shared/helpers/cookie/cookie'
 import { TWENTY_FOUR_HOURS_MILLI_SECONDS } from '../../shared/constants'
+import router from 'next/router'
+import { useTooltipFeedback } from '../../components/TooltipFeedback/hook/useTooltipFeedback'
 
 const Login = () => {
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
   const [nameUser, setNameUser] = useState<string>('')
-  const { data, refetch } = useGetUser(
+  const [buttonStatus, setButtonStatus] = useState<ButtonStatus>('disabled')
+  const { setNotificacionUser, setNotificacionUserType, setNotificacionUserText, TooltipMessage } = useTooltipFeedback()
+
+
+  const { refetch } = useGetUser(
     `getUserByName/${nameUser}`,
     { enabled: false } // Deshabilita la consulta inicial
   )
 
   const loginMongo = async (user: string, password: string) => {
     setNameUser(user)
+    setButtonStatus('loading')
     setTimeout(async () => {
-      await refetch() //ejecutamos la petición con refetch
-        .then(async () => {
-          if (!Array.isArray(data) && data?.password) {
-            const isMatchPassWord = await decryptPass(password, data?.password)
-            if (isMatchPassWord) {
-              setCookie(
-                'authToken',
-                data?.password,
-                TWENTY_FOUR_HOURS_MILLI_SECONDS
-              )
-              console.log(`Usuario ingresó correctamente`)
-            } else {
-              console.log(`Usuario o Contraseña incorrectos`)
-            }
-            console.log(`Conexión de usuario exitosa`)
+      try {
+        const response = await refetch()
+
+        if (!Array.isArray(response?.data) && response?.data?.password) {
+          const isMatchPassWord = await decryptPass(password, response?.data?.password)
+          if (isMatchPassWord) {
+            setCookie(
+              'authToken',
+              response?.data?.password,
+              TWENTY_FOUR_HOURS_MILLI_SECONDS
+            )
+
+            console.log(`Usuario ingresó correctamente`)
+            setNotificacionUserType('success');
+            setNotificacionUserText('Usuario Ingresó correctamente');
+            setNotificacionUser(true);
+            setButtonStatus('disabled')
+            router.push('/')
+          } else {
+
+            console.log(`Usuario o Contraseña incorrectos`)
+            setNotificacionUserType('error');
+            setNotificacionUserText('Usuario o Contraseña incorrectos');
+            setNotificacionUser(true);
+            setButtonStatus('initial')
+
           }
-        })
-        .catch((error) => {
-          console.error('Error al cargar los datos:', error)
-        })
+        } else {
+
+          console.log(`Usuario o Contraseña incorrectos`)
+          setNotificacionUserType('error');
+          setNotificacionUserText('Usuario o Contraseña incorrectos');
+          setNotificacionUser(true);
+          setButtonStatus('initial')
+        }
+      } catch (error) {
+
+        console.error('Error al cargar los datos:', error)
+        setNotificacionUserType('error');
+        setNotificacionUserText('Conexión de usuario erronea');
+        setNotificacionUser(true);
+        setButtonStatus('initial')
+      }
+
     }, 10)
+  }
+
+  const validateFields = (): boolean => {
+    const userValue = inputUser?.current?.value || '';
+    const passwordValue = inputPassword?.current?.value || '';
+    return userValue.length > 0 && passwordValue.length > 0;
+  };
+
+  const handleButtonStatus = () => {
+    const isFieldsValid = validateFields();
+    setButtonStatus(isFieldsValid ? 'initial' : 'disabled');
   }
 
   return (
@@ -57,6 +100,7 @@ const Login = () => {
     >
       <BigScreen>
         <>
+          <TooltipMessage />
           <Container
             isWrap
             width='50%'
@@ -86,6 +130,9 @@ const Login = () => {
                   borderRadius='5px'
                   placeholder='Usuario'
                   textAlign='center'
+                  onChange={() => {
+                    handleButtonStatus()
+                  }}
                 />
               </Column>
               <Spacer.Vertical size={12} />
@@ -100,16 +147,19 @@ const Login = () => {
                   placeholder='Password'
                   textAlign='center'
                   type='password'
+                  onChange={() => {
+                    handleButtonStatus()
+                  }}
                 />
               </Column>
             </Row>
             <Spacer.Horizontal size={24} />
             <Row justifyContent='end'>
               <Button
+                background={buttonStatus === 'initial' ? 'blue' : 'gray'}
                 color='white'
-                label='Acceder'
-                status='initial'
-                background='rgb(13, 33, 89)'
+                label='Ingresar'
+                status={buttonStatus}
                 onClick={() => {
                   loginMongo(
                     inputUser?.current?.value || '',

@@ -9,64 +9,65 @@ import {
   Spacer,
   Text
 } from 'components-front-end'
-import { BigScreen, getGlobalStyle } from 'components-front-end/helpers'
-import { useEffect, useRef, useState } from 'react'
+import { BigScreen, } from 'components-front-end/helpers'
+import { useRef, useState } from 'react'
 import { useGetUser, usePostUser } from '../../shared/hooks/api-db'
-import { TooltipFeedback } from '../../components/TooltipFeedback'
+import { useTooltipFeedback } from '../../components/TooltipFeedback/hook/useTooltipFeedback'
 
+export type typeMessage = 'success' | 'error' | 'warning' | 'info'
 const CrearUsuario = () => {
-  type typeMessage = 'success' | 'error' | 'warning' | 'info'
 
   const inputUser = useRef<HTMLInputElement>(null)
   const inputPassword = useRef<HTMLInputElement>(null)
   const [buttonStatus, setButtonStatus] = useState<ButtonStatus>('disabled')
   const [nameUser, setNameUser] = useState<string>('')
-  const [notificacionUser, setNotificacionUser] = useState<boolean>(false)
-  const [notificacionUserText, setNotificacionUserText] = useState<string>('')
-  const [notificacionUserType, setNotificacionUserType] = useState<typeMessage>('success')
+  const { setNotificacionUser, setNotificacionUserType, setNotificacionUserText, TooltipMessage } = useTooltipFeedback()
 
 
   const { mutate: mustateCreateUser } = usePostUser('createUser')
-
-  const { data: dataGetUser, isSuccess: isSuccesGetUser, refetch: refetchGetUser } = useGetUser(
+  const { isSuccess: isSuccesGetUser, refetch: refetchGetUser } = useGetUser(
     `getUserByName/${nameUser}`,
     { enabled: false } // Deshabilita la consulta inicial
   )
 
   const creaUsuarioMongo = async (usuario: string, password: string) => {
-    setNameUser(usuario)
-    setButtonStatus('loading')
-    const passwordEncrypted: string = await encryptPass(password)
-    setTimeout(async () => {
-      await refetchGetUser().then(async () => {
-        if (
-          !Array.isArray(dataGetUser) &&
-          isSuccesGetUser &&
-          dataGetUser?.user !== usuario
-        ) {
-          mustateCreateUser({ user: usuario, password: passwordEncrypted }, {
-            onSuccess: () => {
-              setNotificacionUserType('success');
-              setNotificacionUserText('Usuario creado correctamente');
-              setNotificacionUser(true);
-              setButtonStatus('disabled');
-            },
-            onError: () => {
-              setNotificacionUserType('error');
-              setNotificacionUserText('Error al crear el usuario');
-              setNotificacionUser(true);
-              setButtonStatus('initial');
-            }
-          })
-        } else {
-          setNotificacionUserType('error')
-          setNotificacionUserText('Usuario ya existe. favor pruebe con otro nombre')
-          setNotificacionUser(true)
-          setButtonStatus('initial')
-        }
-      })
-    }, 500)
-  }
+    setNameUser(usuario);
+    try {
+      setButtonStatus('loading');
+      const passwordEncrypted: string = await encryptPass(password);
+      const response = await refetchGetUser();
+
+      if (!Array.isArray(response?.data) && response?.data?.user !== usuario) {
+        mustateCreateUser({ user: usuario, password: passwordEncrypted }, {
+          onSuccess: () => {
+            setNotificacionUserType('success');
+            setNotificacionUserText('Usuario creado correctamente');
+            setNotificacionUser(true);
+            setButtonStatus('disabled');
+          },
+          onError: () => {
+            setNotificacionUserType('error');
+            setNotificacionUserText('Error al crear el usuario');
+            setNotificacionUser(true);
+            setButtonStatus('initial');
+          }
+        });
+      } else {
+        setNotificacionUserType('error');
+        setNotificacionUserText('Usuario ya existe, favor pruebe con otro nombre');
+        setNotificacionUser(true);
+        setButtonStatus('initial');
+      }
+    } catch (error) {
+      // Manejar los errores aquí
+      console.error('Error en refetchGetUser:', error);
+      setNotificacionUserType('error');
+      setNotificacionUserText('Error al procesar la solicitud');
+      setNotificacionUser(true);
+      setButtonStatus('initial');
+    }
+  };
+
 
   const validateFields = (): boolean => {
     const userValue = inputUser?.current?.value || '';
@@ -79,16 +80,6 @@ const CrearUsuario = () => {
     setButtonStatus(isFieldsValid ? 'initial' : 'disabled');
   }
 
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setNotificacionUser(false)
-    }, 3000)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [notificacionUser])
-
   return (
     <Container
       backgroundColor='white'
@@ -97,28 +88,7 @@ const CrearUsuario = () => {
     >
       <BigScreen>
         <>
-          <Row
-            position='sticky'
-            top='74'
-            zIndex={getGlobalStyle('--z-index-20')}
-          >
-            {notificacionUser && (
-              <Container
-                absoluteDefault='topRight'
-                maxWidth='fit-content'
-                position='absolute'
-                margin='10px'
-              >
-                <TooltipFeedback
-                  onClose={() => {
-                    return setNotificacionUser(false)
-                  }}
-                  text={notificacionUserText}
-                  type={notificacionUserType}
-                />
-              </Container>
-            )}
-          </Row>
+          <TooltipMessage />
           <Container
             isWrap
             width='50%'
@@ -177,7 +147,7 @@ const CrearUsuario = () => {
             <Row justifyContent='end'>
               <Button
                 status={buttonStatus}
-                color={buttonStatus === 'initial' ? 'white' : 'white'}
+                color='white'
                 label='Crear'
                 background={buttonStatus === 'initial' ? 'blue' : 'gray'}
                 onClick={() => {
@@ -191,7 +161,7 @@ const CrearUsuario = () => {
           </Container>
         </>
       </BigScreen>
-    </Container>
+    </Container >
   )
 }
 export default CrearUsuario
