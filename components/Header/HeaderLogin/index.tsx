@@ -1,7 +1,8 @@
-import { Button, Column, Container, Picture, Row } from 'components-front-end'
+import { Button, Column, Container, Picture, Row, Spacer } from 'components-front-end'
 import { getGlobalStyle } from 'components-front-end/helpers'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
+import style from '../Header.module.css'
 
 interface MenuItem {
   label: string;
@@ -24,14 +25,15 @@ export const HeaderLogin = ({
   widthButtons,
 }: HeaderLoginProps) => {
   const router = useRouter()
-  const widthColumnSection = '25'
+  const widthColumnSection = '150px'
   const backgroundButtons = '#0d2159'
   const colorTextButtons = 'white'
   const marginColumnButtons = '0px 5px'
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  const handlerOnClickButton = (textRedirect: string) => {
-    router.push(`/${textRedirect}`)
+  const handlerActionButton = (action: () => void) => {
+    action()
+    setActiveMenu(null);
   }
 
   const handleMenuClick = (menuLabel: string) => {
@@ -68,7 +70,7 @@ export const HeaderLogin = ({
           />
         </Column>
         {menus.map((menu) => (
-          <Column alignSelf='center' margin={marginColumnButtons} customWidth={widthColumnSection} customClassName="menu" key={menu.label}>
+          <Column alignSelf='center' position='relative' margin={marginColumnButtons} width={widthColumnSection} key={menu.label}>
             <Button
               background={backgroundButtons}
               minWidth={widthButtons}
@@ -81,19 +83,22 @@ export const HeaderLogin = ({
             </Button>
 
             {activeMenu === menu.label && (
-              <Row className="menu-items">
+              <Row zIndex='10' justifyContent='center' isWrap customClassName={style.headerLogin} position='absolute' >
                 {menu.items.map((item) => (
-                  <Column key={item.label}>
-                    <Button background={backgroundButtons}
-                      minWidth={widthButtons}
-                      width={widthButtons}
-                      fontSize={fontSizeBUtton}
-                      label={item.label}
-                      color={colorTextButtons}
-                      onClick={item.action}></Button>
-                  </Column>
+                  <>
+                    <Spacer.Horizontal size={2} />
+                    <Column alignItems='center' key={item.label}>
+                      <Button background={backgroundButtons}
+                        minWidth='140px'
+                        width='140px'
+                        fontSize={fontSizeBUtton}
+                        label={item.label}
+                        color={colorTextButtons}
+                        onClick={() => handlerActionButton(item.action)}></Button>
+                    </Column>
+                  </>
                 ))}
-              </Row>
+              </Row >
             )}
           </Column>
         ))}

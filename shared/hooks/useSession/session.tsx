@@ -54,14 +54,10 @@ const useSession = () => {
         console.log('cookie no existe')
       }
     };
-
-
-
     checkSession()
-
     const intervalId = setInterval(checkSession, 15 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [authToken]);
+  }, [authToken, router.pathname]);
 
 
   return { isLoggedIn, TooltipUserLogin: TooltipMessage };

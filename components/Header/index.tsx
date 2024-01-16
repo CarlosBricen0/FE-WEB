@@ -14,17 +14,30 @@ interface HeaderProps {
   isLoggedIn: boolean;
 }
 export const Header = ({ isLoggedIn }: HeaderProps): React.ReactElement => {
-  const menus = [
+  const menuLogin = [
     {
       label: 'Usuarios',
       items: [
         {
           label: 'Crear Usuario',
-          action: () => router.push(`/CrearUsuario}`),
+          action: () => router.push('/CrearUsuario'),
         },
         {
           label: 'ModificarUsuario',
-          action: () => alert('Item 2 clicked'),
+          action: () => alert('Modificar Usuario  clicked'),
+        },
+      ],
+    },
+    {
+      label: 'Modulos',
+      items: [
+        {
+          label: 'Crear Modulo',
+          action: () => alert('Crear Modulo clicked'),
+        },
+        {
+          label: 'Modificar Modulo',
+          action: () => alert('Modificar Modulo  clicked'),
         },
       ],
     },
@@ -55,7 +68,7 @@ export const Header = ({ isLoggedIn }: HeaderProps): React.ReactElement => {
       <BigScreen>
         {isLoggedIn ?
           <HeaderLogin
-            menus={menus}
+            menus={menuLogin}
             fontSizeBUtton='16px'
             widthButtons='150px'
           /> : <HeaderLogout
@@ -66,7 +79,7 @@ export const Header = ({ isLoggedIn }: HeaderProps): React.ReactElement => {
       <SmallScreen>
         {isLoggedIn ?
           <HeaderLogin
-            menus={menus}
+            menus={menuLogin}
             fontSizeBUtton='8px'
             widthButtons='80px'
           /> : <HeaderLogout
