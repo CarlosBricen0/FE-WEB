@@ -1,3 +1,20 @@
+# Validación actual · extracción backend, 30 de octubre de 2026
+
+- FE-WEB: arquitectura sin Prisma/SDK/secretos backend, TypeScript, ESLint, dos pruebas de transporte y build Next comprobados.
+- BE-Node: TypeScript, compilación Node independiente y 13 pruebas unitarias/HTTP sin proveedores externos. Las pruebas de integración se omiten explícitamente en npm test.
+- PostgreSQL desde BE: tres migraciones sin pendientes ni cambios de SQL; diez escenarios del ciclo de pagos y un recorrido HTTP de aislamiento/autorización contra onlyhorse_test.
+- Seguridad: JWT RS256 válido frente a firma/issuer/audience/expiración inválidos, credenciales ausentes, cabeceras x-user falsas, permisos admin, actor concurrente aislado, ocultación premium, autor derivado del token y pedidos ajenos inaccesibles.
+- Estado PostgreSQL trasladado a BE-Node/.local con parada controlada, conservando datos, puerto 5433 y bases. Backup restaurado en base temporal con 14 tablas antes y después del traslado.
+- FE-React no cambia en esta extracción; mantiene la validación anterior y sus pendientes Sonar/herramientas.
+
+No se acredita login Kinde real, carga Cloudinary real, correo Resend entregado, habilitación o cobros Mercado Pago reales, revisión visual completa ni despliegue productivo: faltan cuentas/configuración del titular y hosting. Los tokens y respuestas de proveedor de las pruebas son fixtures; la persistencia de integración sí usa PostgreSQL real.
+
+Los comandos DB, integración y respaldo descritos históricamente bajo FE-WEB ahora se ejecutan en BE-Node. Los endpoints antiguos de FE para webhook/cron retornan 410. Ver SERVICES.md para las rutas vigentes.
+
+---
+
+## Evidencia histórica previa a la extracción
+
 # Validación · actualización Mercado Pago y PostgreSQL
 
 ## Evidencia de esta iteración

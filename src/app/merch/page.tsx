@@ -3,15 +3,12 @@ import { redirect } from "next/navigation";
 import BaseLayout from "@/components/BaseLayout";
 import ProductCard from "@/components/ProductCard";
 import UnderlinedText from "@/components/decorators/UnderlinedText";
-import prisma from "@/db/prisma";
+import { api } from "@/lib/backend";
+import type { Product } from "@/lib/types";
 
 const Page = async () => {
  if (!(await getKindeServerSession().isAuthenticated())) redirect("/");
-	const products = await prisma.product.findMany({
-		where: {
-			isArchived: false,
-		},
-	});
+	const products = await api<Product[]>("/v1/products");
 
 	return (
 		<BaseLayout renderRightPanel={false}>

@@ -1,10 +1,4 @@
 'use server';
-import prisma from '@/db/prisma';
-import { requireUser } from '@/lib/auth';
-export async function checkProductPaidStatus(orderId: string) {
-  const user = await requireUser();
-  const order = await prisma.order.findFirst({ where: { id: orderId, userId: user.id }, select: {
-    product: true, isPaid: true, paymentStatus: true, price: true, currency: true, size: true, shippingAddress: true,
-  }});
-  return order || false;
-}
+import { api } from '@/lib/backend';
+import type { OrderSummary } from '@/lib/types';
+export async function checkProductPaidStatus(id:string) { return api<OrderSummary | false>(`/v1/orders/${encodeURIComponent(id)}`); }

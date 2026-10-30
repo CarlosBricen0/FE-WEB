@@ -1,16 +1,19 @@
 # FE-WEB · OnlyHorse / Mercado Pago Chile
 
-Aplicación Next.js que consume el kit de FE-React y mantiene su lógica de servidor en el mismo proyecto: Kinde, Prisma/PostgreSQL, Mercado Pago, Cloudinary y Resend. Los repositorios y ramas Git permanecen independientes.
+Interfaz Next.js que consume los componentes de FE-React y la API independiente de [BE-Node](https://github.com/CarlosBricen0/BE-Node). FE-WEB administra la sesión Kinde y adapta llamadas de UI a HTTP; base de datos, pagos, permisos, firmas de archivos, correo y conciliación pertenecen a BE-Node. Cada carpeta conserva su repositorio y rama.
 
-- [Seguimiento punto por punto](docs/ROADMAP.md)
-- [Activar servicios y probar](docs/SERVICES.md)
-- [Decisión PostgreSQL / backend](docs/ADR-POSTGRES-BACKEND.md)
-- [Validación y límites](docs/VALIDATION.md)
-- [Preparación de producción](docs/PRODUCTION.md)
+- [Seguimiento de producción](docs/ROADMAP.md)
+- [Servicios y configuración](docs/SERVICES.md)
+- [Arquitectura](docs/ARCHITECTURE.md)
+- [Decisión PostgreSQL/backend](docs/ADR-POSTGRES-BACKEND.md)
+- [Validación](docs/VALIDATION.md)
+- [Producción](docs/PRODUCTION.md)
 
 ## Arranque local
 
-Node 22. Las carpetas FE-React y FE-WEB deben ser hermanas. Primero, en FE-React:
+Node 22. FE-React y FE-WEB deben ser carpetas hermanas por la dependencia de componentes. BE-Node puede ejecutarse desde cualquier ubicación mediante su URL.
+
+En FE-React:
 
 ```sh
 npm ci
@@ -18,51 +21,48 @@ npm run build:creator-css
 npm run sb
 ```
 
-Después, en FE-WEB, con PostgreSQL 16 instalado:
+En BE-Node, con PostgreSQL 16 instalado y conservando `.env` si ya existe:
 
 ```sh
-npm ci --no-install-links
+npm ci
+# Solo en una instalación nueva: cp .env.example .env
 npm run db:local
 npm run db:deploy
+# Solo demostración, no producción:
 npm run db:seed
-npm run check:services
 npm run dev
 ```
 
-Web: http://localhost:3001. Storybook: http://localhost:6007. `check:services` devuelve salida 1 mientras falten servicios; no es un fallo de la base si PostgreSQL aparece OK. Las cuentas externas todavía deben configurarse en `.env.local`, generado desde el ejemplo sin inventar credenciales. Los precios de membresía deben definirse explícitamente.
+En FE-WEB, conservando `.env.local` si ya existe:
 
-`db:local` inicia una instancia privada en 127.0.0.1:5433 con bases onlyhorse/onlyhorse_test y credenciales aleatorias ignoradas. El rol de aplicación no es superusuario. Para detenerla: `npm run db:local:stop`. El script no sobrescribe una URL de base externa.
+```sh
+npm ci --no-install-links
+# Solo en una instalación nueva: cp .env.local.example .env.local
+npm run dev
+```
 
-`compose.yaml` se conserva como alternativa de desarrollo con Docker; elegir un solo servidor en el puerto 5433. La instancia verificada en esta entrega es la nativa. No se ha creado infraestructura productiva.
+Web http://localhost:3001, API http://127.0.0.1:4000 y Storybook http://localhost:6007. `BACKEND_API_URL` solo se usa en el servidor Next. Configurar Kinde y la misma audiencia en ambos repos para acceder a funciones privadas. Sin cuentas externas la landing permanece disponible; no se simulan usuarios ni pagos.
 
-## Pagos y moneda
-
-Mercado Pago usa Checkout Pro para productos y preapproval para membresías mensual/anual. Los registros nuevos usan CLP en pesos enteros; los datos históricos USD conservan su moneda/unidad, sin conversión automática. El checkout de productos USD históricos queda bloqueado hasta que se configure un catálogo CLP.
-
-El webhook `/api/webhooks/mercadopago` valida firma y consulta el recurso real. Se verifican comercio, modo, moneda, monto y referencia interna. Un retorno del navegador o una autorización de suscripción no equivale a pago aprobado. La página `/billing` permite actualizar estado y cancelar renovación; ya no se usa el portal de Stripe. El webhook Stripe devuelve 410 y no hay un cliente Stripe activo.
-
-La integración está probada con fixtures de API y PostgreSQL real, no con cobros de una cuenta externa. Seguir SERVICES.md para preparar la aplicación Mercado Pago Chile, test users, HTTPS y notificaciones. Nunca usar tarjetas reales para suplir pruebas pendientes.
+Los comandos `db:*`, `test:integration`, secretos de proveedores y el estado `.local/` se trasladaron a BE-Node. PostgreSQL conserva el puerto 5433, bases, datos y migraciones; FE-WEB ya no tiene cliente Prisma ni DATABASE_URL.
 
 ## Comprobaciones
 
 ```sh
+npm run check:architecture
 npm run typecheck
 npm run lint
 npm test
-npm run test:integration
-npm run db:backup:verify
 npm run build
 npm start
+npm run test:http
 ```
 
-Detener `npm run dev` antes de `npm start`, porque ambos usan el puerto 3001. `npm run test:http` está diseñado para el entorno sin autenticación/proveedores configurados; debe adaptarse al conectar Kinde. `npm run check:env` imprime nombres de campos faltantes sin sus valores.
-
-Los backups locales se guardan en `.local/backups`, fuera de Git. `db:backup:verify` restaura una copia en una base temporal aislada y la elimina tras comprobar las tablas. Esto no sustituye almacenamiento externo, retención y pruebas de recuperación de producción.
+Detener `dev` antes de `start` (comparten 3001). `test:http` es para el entorno sin Kinde configurado; al conectar proveedores usar los recorridos de SERVICES.md. Las pruebas de negocio y de PostgreSQL se ejecutan desde BE-Node. `check:env` y `check:services` informan pendientes sin imprimir valores.
 
 ## Componentes y CI
 
-FE-WEB consume `components-front-end: file:../FE-React`. Next transpila el paquete y resuelve React del consumidor en cliente. Tras cambios de la biblioteca, ejecutar `npm run sync:components`.
+Dependencia `components-front-end: file:../FE-React`; Next transpila el paquete y resuelve React del consumidor en cliente. Tras cambios en la biblioteca: `npm run sync:components`. CI descarga FE-React fijado a commit, valida arquitectura, tipos, lint, pruebas y build; no inicia PostgreSQL ni gestiona migraciones. BE-Node tiene su propio CI de API, pagos y base de datos.
 
-El workflow del PR prepara ambos repositorios y PostgreSQL de pruebas. El ref de FE-React está fijado a un commit compatible; puede especificarse otro al ejecutar manualmente el workflow. Ese workflow valida, no despliega. Para un hosting que descargue solo FE-WEB falta publicar la biblioteca o preparar un artefacto completo; ver ROADMAP.md.
+Para hosting que descarga solo FE-WEB, aún debe resolverse la publicación de la biblioteca o un artefacto con ambos checkouts. La API sí se despliega independientemente. Ver ROADMAP.md antes de abrir ventas.
 
-La aplicación activa está en `src/app`. El starter anterior permanece en `legacy/pages`, fuera de las rutas productivas; no restaurar el listado de contraseñas de ese starter. Adaptación inicial del [tutorial de Codesistency](https://www.youtube.com/watch?v=mduqkHlJujA), con [licencia MIT conservada](LICENSE.onlyhorse).
+Aplicación activa en `src/app`; starter anterior en `legacy/pages`, fuera de rutas productivas. Adaptación del [tutorial de Codesistency](https://www.youtube.com/watch?v=mduqkHlJujA), con [licencia MIT conservada](LICENSE.onlyhorse).

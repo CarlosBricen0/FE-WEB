@@ -1,27 +1,13 @@
-import prisma from "@/db/prisma";
+import { api } from "@/lib/backend";
+import type { CreatorProfile } from "@/lib/types";
 import { Heart, Image as ImageIcon, Video } from "lucide-react";
 import Image from "next/image";
 
 const CoverImage = async ({ adminName }: { adminName: string }) => {
-	const imageCount = await prisma.post.count({
-		where: {
-			mediaType: "image",
-		},
-	});
-
-	const videoCount = await prisma.post.count({
-		where: {
-			mediaType: "video",
-		},
-	});
-
-	// const totalLikes = await prisma.like.count();
-
-	const totalLikes = await prisma.post.aggregate({
-		_sum: {
-			likes: true,
-		},
-	});
+	const creator = await api<CreatorProfile | null>('/v1/creator','GET',undefined,false);
+ const imageCount = creator?.imageCount || 0;
+ const videoCount = creator?.videoCount || 0;
+ const totalLikes = creator?.totalLikes || 0;
 
 	function formatNumber(num: number) {
 		if (num >= 1000000) {
@@ -66,7 +52,7 @@ const CoverImage = async ({ adminName }: { adminName: string }) => {
 							<span className='text-xs'>•</span>
 							<div className='flex items-center gap-1'>
 								<Heart className='w-4 h-4' />
-								<span className='text-sm font-bold'>{formatNumber(totalLikes._sum.likes || 0)}</span>
+								<span className='text-sm font-bold'>{formatNumber(totalLikes)}</span>
 							</div>
 						</div>
 					</div>

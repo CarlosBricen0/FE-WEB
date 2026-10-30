@@ -1,12 +1,13 @@
 import BaseLayout from "@/components/BaseLayout";
 import UserProfile from "./UserProfile";
 import Posts from "./Posts";
-import prisma from "@/db/prisma";
+import { api } from "@/lib/backend";
+import type { CreatorProfile } from "@/lib/types";
 import { getUserProfileAction } from "@/app/update-profile/actions";
 import { notFound } from "next/navigation";
 
 const HomeScreen = async () => {
-	const admin = await prisma.user.findUnique({ where: { ...(process.env.ADMIN_USER_ID ? { id: process.env.ADMIN_USER_ID } : { email: (process.env.ADMIN_EMAIL || "").toLowerCase() }) }, select: { id: true, name: true, image: true } });
+	const admin = await api<CreatorProfile | null>("/v1/creator", "GET", undefined, false);
 	const user = await getUserProfileAction();
 
 	if (!user) return notFound();

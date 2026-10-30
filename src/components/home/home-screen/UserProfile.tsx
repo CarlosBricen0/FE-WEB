@@ -2,15 +2,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "components-front-end/creato
 import CoverImage from "./CoverImage";
 import { Button } from "components-front-end/creator/ui/button";
 import Link from "next/link";
-import prisma from "@/db/prisma";
+import { api } from "@/lib/backend";
+import type { CreatorProfile } from "@/lib/types";
 import { getUserProfileAction } from "@/app/update-profile/actions";
 
 const UserProfile = async () => {
-	const admin = await prisma.user.findUnique({
-		where: {
-			...(process.env.ADMIN_USER_ID ? { id: process.env.ADMIN_USER_ID } : { email: (process.env.ADMIN_EMAIL || "").toLowerCase() }),
-		},
-	});
+	const admin = await api<CreatorProfile | null>("/v1/creator", "GET", undefined, false);
 
 	const currentUser = await getUserProfileAction();
 

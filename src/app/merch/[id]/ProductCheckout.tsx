@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Product } from '@prisma/client';
+import type { Product } from '@/lib/types';
 import ZoomedImage from '@/components/ZoomedImage';
 import { Button } from 'components-front-end/creator/ui/button';
 import { Input } from 'components-front-end/creator/ui/input';
