@@ -1,0 +1,59 @@
+name: Validate platform with FE-React and PostgreSQL
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      components_ref:
+        description: Published branch or commit in FE-React
+        default: 4ac71915019eba6976cfcccc31da470c581b85e4
+        required: true
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: onlyhorse
+          POSTGRES_PASSWORD: ci-only-disposable
+          POSTGRES_DB: onlyhorse
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U onlyhorse"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://onlyhorse:ci-only-disposable@127.0.0.1:5433/onlyhorse?schema=public
+      TEST_DATABASE_URL: postgresql://onlyhorse:ci-only-disposable@127.0.0.1:5433/onlyhorse_test?schema=public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: FE-WEB
+      - uses: actions/checkout@v4
+        with:
+          repository: CarlosBricen0/FE-React
+          ref: ${{ inputs.components_ref || '4ac71915019eba6976cfcccc31da470c581b85e4' }}
+          path: FE-React
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: FE-React
+      - run: npm run build:creator-css
+        working-directory: FE-React
+      - run: npm ci --no-install-links
+        working-directory: FE-WEB
+      - run: docker exec ${{ job.services.postgres.id }} createdb --username=onlyhorse onlyhorse_test
+      - run: npm run db:deploy
+        working-directory: FE-WEB
+      - run: npm run typecheck
+        working-directory: FE-WEB
+      - run: npm run lint
+        working-directory: FE-WEB
+      - run: npm test
+        working-directory: FE-WEB
+      - run: npm run test:integration
+        working-directory: FE-WEB
+      - run: npm run build
+        working-directory: FE-WEB
