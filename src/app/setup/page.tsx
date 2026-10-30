@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function Setup() { return <main className="max-w-xl mx-auto p-10 space-y-5"><h1 className="text-3xl font-bold">Connect your services</h1><p>The landing page is available. To sign in and use memberships, configure Kinde, PostgreSQL, Mercado Pago, Cloudinary and Resend in your local environment.</p><p>Follow README.md and run <code>npm run check:env</code>. No payments or subscriptions are simulated.</p><Link href="/" className="text-primary underline">Return to OnlyHorse</Link></main> }

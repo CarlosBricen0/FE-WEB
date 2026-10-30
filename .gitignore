@@ -9,8 +9,6 @@
 /coverage
 
 # package-lock
-/package-lock.json
-package-lock.json
 
 # next.js
 /.next/
@@ -37,3 +35,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.env
+.env.*
+!.env.local.example
+
+.local/
+backups/

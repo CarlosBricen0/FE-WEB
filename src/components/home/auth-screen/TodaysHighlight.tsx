@@ -1,0 +1,1 @@
+export default function TodaysHighlight() { return <div className="w-full md:w-3/4 mx-auto"><video controls playsInline preload="metadata" poster="/horse-1.png" aria-label="Today’s highlight from the farm" className="rounded-md w-full" src="/videos/highlighted-vid.mp4">Your browser does not support video playback.</video></div>; }
