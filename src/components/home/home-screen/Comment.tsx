@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "components-front-end/creator/ui/avatar";
-import { Prisma } from "@prisma/client";
 
 import type { FeedComment as CommentWithUser } from "@/lib/types";
 

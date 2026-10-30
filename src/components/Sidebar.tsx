@@ -10,7 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "components-front-end/creator/ui/dropdown-menu";
 import { ModeToggle } from "./ModeToggle";
-import { getKindeServerSession, isAdminUser } from "@/lib/auth";
+import { isAdminUser } from "@/lib/auth";
 import LogoutButton from "./LogoutButton";
 import { getUserProfileAction } from "@/app/update-profile/actions";
 
@@ -28,12 +28,11 @@ const SIDEBAR_LINKS = [
 ];
 
 const Sidebar = async () => {
-	const { getUser } = getKindeServerSession();
-	const user = await getUser();
+
 
 	const userProfile = await getUserProfileAction();
 
-	const isAdmin = isAdminUser(user);
+	const isAdmin = isAdminUser(userProfile);
 
 	return (
 		<div

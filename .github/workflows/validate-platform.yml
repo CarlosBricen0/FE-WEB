@@ -1,4 +1,4 @@
-name: Validate platform with FE-React and PostgreSQL
+name: Validate frontend with FE-React
 on:
   pull_request:
   workflow_dispatch:
@@ -12,20 +12,6 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: onlyhorse
-          POSTGRES_PASSWORD: ci-only-disposable
-          POSTGRES_DB: onlyhorse
-        ports: ['5433:5432']
-        options: >-
-          --health-cmd "pg_isready -U onlyhorse"
-          --health-interval 5s --health-timeout 5s --health-retries 10
-    env:
-      DATABASE_URL: postgresql://onlyhorse:ci-only-disposable@127.0.0.1:5433/onlyhorse?schema=public
-      TEST_DATABASE_URL: postgresql://onlyhorse:ci-only-disposable@127.0.0.1:5433/onlyhorse_test?schema=public
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,16 +30,13 @@ jobs:
         working-directory: FE-React
       - run: npm ci --no-install-links
         working-directory: FE-WEB
-      - run: docker exec ${{ job.services.postgres.id }} createdb --username=onlyhorse onlyhorse_test
-      - run: npm run db:deploy
-        working-directory: FE-WEB
       - run: npm run typecheck
         working-directory: FE-WEB
       - run: npm run lint
         working-directory: FE-WEB
       - run: npm test
         working-directory: FE-WEB
-      - run: npm run test:integration
+      - run: npm run check:architecture
         working-directory: FE-WEB
       - run: npm run build
         working-directory: FE-WEB

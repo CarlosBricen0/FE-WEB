@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 const cases = [
  ['/',200], ['/pricing',200], ['/setup',200], ['/merch','redirect'], ['/merch/not-a-product','redirect'], ['/update-profile','redirect'], ['/secret-dashboard','notFound'],
- ['/api/checkout?plan=invalid',400], ['/api/checkout?plan=monthly',307], ['/api/billing',307], ['/api/auth/login',307], ['/api/cron/emails',401],
- ['/api/sign-image',401,'POST'], ['/api/webhooks/stripe',410,'POST'], ['/api/webhooks/mercadopago',503,'POST'], ['/api/cron/billing',401], ['/billing','redirect'],
+ ['/api/checkout?plan=invalid',400], ['/api/checkout?plan=monthly',307], ['/api/billing',307], ['/api/auth/login',307], ['/api/cron/emails',410],
+ ['/api/sign-image',401,'POST'], ['/api/webhooks/stripe',410,'POST'], ['/api/webhooks/mercadopago',410,'POST'], ['/api/cron/billing',410], ['/billing','redirect'],
 ];
 for (const [path, expected, method = 'GET'] of cases) {
  const response = await fetch(`http://localhost:3001${path}`, { method, redirect: 'manual', headers: { 'content-type': 'application/json' }, ...(method === 'POST' ? { body: '{}' } : {}) });

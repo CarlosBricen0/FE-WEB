@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toggleProductArchiveAction } from "@/app/secret-dashboard/actions";
 import { useToast } from "components-front-end/creator/ui/use-toast";
 
-const ProductCard = ({ product, adminView = false }: { product: import("@prisma/client").Product; adminView?: boolean }) => {
+const ProductCard = ({ product, adminView = false }: { product: import("@/lib/types").Product; adminView?: boolean }) => {
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
 

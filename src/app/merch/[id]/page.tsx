@@ -4,24 +4,16 @@ import BaseLayout from "@/components/BaseLayout";
 import ProductCard from "@/components/ProductCard";
 import UnderlinedText from "@/components/decorators/UnderlinedText";
 import ProductCheckout from "./ProductCheckout";
-import prisma from "@/db/prisma";
+import { api } from "@/lib/backend";
+import type { Product } from "@/lib/types";
 import { notFound } from "next/navigation";
 
 const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	if (!(await getKindeServerSession().isAuthenticated())) redirect("/");
  const { id } = await params;
-	const currentProduct = await prisma.product.findUnique({
-		where: {
-			id: id,
-		},
-	});
+	const currentProduct = (await api<Product[]>("/v1/products")).find(product => product.id === id);
 
-	const products = await prisma.product.findMany({
-		where: {
-			isArchived: false,
-			id: { not: id },
-		},
-	});
+	const products = await api<Product[]>("/v1/products");
 
 	if (!currentProduct || currentProduct.isArchived) return notFound();
 
@@ -35,7 +27,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 					<UnderlinedText className='decoration-wavy underline-offset-8'>OnlyHorse</UnderlinedText>
 				</h1>
 				<div className='grid gap-5 grid-cols-1 md:grid-cols-2'>
-					{products.map((product) => (
+					{products.filter(product => product.id !== id).map((product) => (
 						<ProductCard key={product.id} product={product} />
 					))}
 				</div>

@@ -4,7 +4,7 @@ import { formatMoney, cn } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "components-front-end/creator/ui/button";
 import ZoomedImage from "./ZoomedImage";
-import { Product } from "@prisma/client";
+import type { Product } from "@/lib/types";
 
 const SuggestedProduct = ({ product }: { product: Product }) => {
 	return (
